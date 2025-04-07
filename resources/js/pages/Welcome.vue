@@ -2,16 +2,18 @@
 import { ref, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import Carousel from '@/components/Carousel.vue';
+import CarouselHome from '@/components/CarouselHome.vue';
 import HomeLayout from '@/layouts/HomeLayout.vue'; 
 
 const elements = ref<HTMLElement[]>([]);
 
-interface Props {
-    canLogin: boolean;
-    canRegister: boolean;
-}
+const props = defineProps({
+    vehicles: {
+      type: Object,
+      required: true
+    }
+  });
 
-defineProps<Props>();
 
 onMounted(() => {
     elements.value = Array.from(document.querySelectorAll('.fade-target'));
@@ -45,6 +47,7 @@ onMounted(() => {
                 Visítanos y experimenta la excelencia en servicio y calidad que nos distingue.
             </p>
         </article>
+        <CarouselHome :vehicles="vehicles" />
         <article class="fade-target invisible grid grid-cols-1 text-white md:grid-cols-2 bg-greenBold text-center space-x-6 px-4 py-12">
             <div class="flex flex-col justify-center items-center cols-span-1 px-4">
                 <svg xmlns="http://www.w3.org/2000/svg"  width="80"  height="80"  viewBox="0 0 24 24"  fill="none"  stroke="white"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-car"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" /></svg>
@@ -66,7 +69,7 @@ onMounted(() => {
                 </p>
             </div>
         </article>
-
+        <CarouselHome :vehicles="vehicles" />
         <article class="fade-target invisible grid grid-cols-1 md:grid-cols-3 container mx-auto my-7 text-center">
             <div class="my-4 py-2 px-2">
                 <header class="py-4 text-xl">
