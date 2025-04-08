@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Transaction;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -45,20 +46,15 @@ class CheckoutVehicleController extends Controller
     {
         $stripePriceId = $vehicle->stripe_price_id;
         $quantity = 1;
+        $orderId = $request->input('order_id'); 
 
         return Inertia::location($request->user()->checkout([$stripePriceId => $quantity], [
             'success_url' => route('checkout-success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout-cancel'),
+            'metadata' => [
+                'order_id' => $orderId, 
+            ]
         ])->url);
-    }
-
-    public function sucess(Request $request)
-    {
-        $sessionId = $request->get('session_id');
-
-        if ($sessionId === null) {
-            return;
-        }
     }
 
     public function completePayment(Request $request, Order $order)
@@ -108,27 +104,43 @@ class CheckoutVehicleController extends Controller
     public function success(Request $request)
     {
         $sessionId = $request->get('session_id');
- 
+     
         if ($sessionId === null) {
-            return;
+            return redirect()->route('checkout-cancel');
         }
-
+    
         $session = Cashier::stripe()->checkout->sessions->retrieve($sessionId);
-
         
         if ($session->payment_status !== 'paid') {
-            return;
+            return redirect()->route('checkout-cancel');
         }
-
-        return Inertia::render('Checkout/Success', [
+    
+        // Obtener el order_id del metadata de la sesión de Stripe
+        $orderId = $session->metadata->order_id ?? null;
+        
+        if ($orderId) {
+            $order = Order::find($orderId);
+            
+            if ($order) {
+                $transaction = Transaction::create([
+                    'order_id' => $order->id,
+                    'amount' => $session->amount_total / 100, 
+                    'type' => 'deposit', 
+                    'status' => 'completed',
+                    'payment_method' => $session->payment_method_types[0] ?? 'card',
+                    'transaction_date' => now(),
+                ]);
+                $order->update(['status' => 'completado']);
+            }
+        }
+    
+        return Inertia::render('checkout/Success', [
             'checkoutSession' => $session,
         ]);
-
-        return view('checkout.success');
     }
 
     public function cancel()
     {
-        return Inertia::render('Checkout/Cancel');
+        return Inertia::render('checkout/Cancel');
     }
 }

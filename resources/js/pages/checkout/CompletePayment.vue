@@ -53,7 +53,10 @@ export default defineComponent({
   },
   methods: {
     payWithStripe(): void {
-      this.$inertia.get(route('vehicles.checkout.process', { vehicle: this.vehicle.id }));
+      this.$inertia.post(route('vehicles.checkout.process', { 
+        vehicle: this.vehicle.id,
+        order_id: this.order.id  
+      }));
     },
     openModal(method: string): void {
       this.currentPaymentMethod = method;
