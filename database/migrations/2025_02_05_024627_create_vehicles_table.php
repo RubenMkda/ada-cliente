@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->year('year');
             $table->decimal('price', 12, 2);
             $table->string('VIN', 17)->unique();
-            $table->enum('status', ['disponible', 'vendido', 'reservado'])->default('disponible');
+            $table->enum('status', ['disponible', 'comprado'])->default('disponible');
             $table->string('stripe_price_id')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -9,39 +9,31 @@ DataTable.use(DataTablesCore);
 
 const columns = [
   { data: 'id', title: 'ID' },
-  { data: 'user_id', title: 'User ID' },
-  { data: 'type', title: 'Type' },
-  { data: 'total_amount', title: 'Total Amount' },
-  { data: 'status', title: 'Status' },
-  {
-    data: null,
-    title: 'Actions',
-    render: function (data, type, row) {
-      return `
-        <button class="btn-edit" data-id="${row.id}">Edit</button>
-        <button class="btn-delete" data-id="${row.id}">Delete</button>
-      `;
-    },
-  },
+  { data: 'amount', title: 'Amount', render: (data) => `$${parseFloat(data).toFixed(2)}` },
+  { data: 'type', title: 'Type', render: (data) => data.replace('_', ' ').toUpperCase() },
+  { data: 'status', title: 'Status', render: (data) => data.toUpperCase() },
+  { data: 'payment_method', title: 'Payment Method' },
 ];
 
 const options = {
   responsive: true,
   select: true,
+  columnDefs: [
+    { targets: [0], width: '5%' },
+    { targets: [1, 2, 3, 4], width: '10%' },
+  ]
 };
 
 const props = defineProps<{
-  orders: Array<{
+  transactions: Array<{
     id: number;
+    order_id: number;
     user_id: number;
+    amount: number;
     type: string;
-    total_amount: number;
     status: string;
-    broker_fees: Array<{
-      id: number;
-      order_id: number;
-      broker_fee: number;
-    }>;
+    payment_method: string;
+    transaction_date: string;
   }>;
 }>();
 
@@ -52,29 +44,40 @@ onMounted(() => {
     const target = event.target as HTMLElement;
 
     if (target.classList.contains('btn-edit')) {
-      const orderId = target.getAttribute('data-id');
-      const order = props.orders.find(order => order.id === parseInt(orderId));
-      if (order) {
-        openEditModal(order);
+      const transactionId = target.getAttribute('data-id');
+      const transaction = props.transactions.find(t => t.id === parseInt(transactionId));
+      if (transaction) {
+        openEditModal(transaction);
       }
     }
 
-
+    if (target.classList.contains('btn-delete')) {
+      const transactionId = target.getAttribute('data-id');
+      if (confirm('Are you sure you want to delete this transaction?')) {
+        deleteTransaction(parseInt(transactionId));
+      }
+    }
   });
 });
 
-const deleteOrder = (orderId: number) => {
-  console.log('Delete order:', orderId);
+const deleteTransaction = (transactionId: number) => {
+  console.log('Delete transaction:', transactionId);
+  // Add your delete logic here
+};
+
+const openEditModal = (transaction: any) => {
+  console.log('Edit transaction:', transaction);
+  // Add your edit modal logic here
 };
 </script>
 
 <template>
-  <Head title="Orders" />
+  <Head title="Transactions" />
 
   <AppLayout>
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
       <h1 class="text-xl font-semibold">Transactions</h1>
-      <DataTable :columns="columns" :data="orders" :options="options" class="display" />
+      <DataTable :columns="columns" :data="transactions" :options="options" class="display" />
     </div>
   </AppLayout>
 </template>

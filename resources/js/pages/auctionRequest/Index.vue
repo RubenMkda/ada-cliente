@@ -10,8 +10,9 @@ DataTable.use(DataTablesCore);
 const columns = [
   { data: 'id', title: 'ID' },
   { data: 'user_id', title: 'User ID' },
-  { data: 'type', title: 'Type' },
-  { data: 'total_amount', title: 'Total Amount' },
+  { data: 'platform', title: 'Platform' },
+  { data: 'vin', title: 'VIN' },
+  { data: 'max_bid', title: 'Max Bid' },
   { data: 'status', title: 'Status' },
 ];
 
@@ -21,17 +22,22 @@ const options = {
 };
 
 const props = defineProps<{
-  orders: Array<{
+  auctionRequests: Array<{
     id: number;
     user_id: number;
-    type: string;
-    total_amount: number;
-    status: string;
-    broker_fees: Array<{
-      id: number;
-      order_id: number;
-      broker_fee: number;
-    }>;
+    platform: 'Copart' | 'IAAI' | 'Manheim' | 'ACV Auctions';
+    vin: string;
+    lot_number: string | null;
+    vehicle_location: string;
+    max_bid: number;
+    auction_url: string | null;
+    transport_quote: boolean;
+    carfax_quote: boolean;
+    comments: string | null;
+    service_fee: number;
+    stripe_price_id: string | null;
+    stripe_product_id: string | null;
+    status: 'pending' | 'active' | 'completed' | 'cancelled';
   }>;
 }>();
 
@@ -42,29 +48,20 @@ onMounted(() => {
     const target = event.target as HTMLElement;
 
     if (target.classList.contains('btn-edit')) {
-      const orderId = target.getAttribute('data-id');
-      const order = props.orders.find(order => order.id === parseInt(orderId));
-      if (order) {
-        openEditModal(order);
-      }
+      const requestId = target.getAttribute('data-id');
+      const request = props.auctionRequests.find(request => request.id === parseInt(requestId));
     }
-
-
   });
 });
-
-const deleteOrder = (orderId: number) => {
-  console.log('Delete order:', orderId);
-};
 </script>
 
 <template>
-  <Head title="Orders" />
+  <Head title="Auction Requests" />
 
   <AppLayout>
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-      <h1 class="text-xl font-semibold">Orders</h1>
-      <DataTable :columns="columns" :data="orders" :options="options" class="display" />
+      <h1 class="text-xl font-semibold">Auction Requests</h1>
+      <DataTable :columns="columns" :data="auctionRequests" :options="options" class="display" />
     </div>
   </AppLayout>
 </template>

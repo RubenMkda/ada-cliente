@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuctionRequestController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\orderController;
 use App\Http\Controllers\transactionsController;
@@ -18,7 +19,12 @@ Route::get('dashboard', function () {
 
 Route::get('orders', [orderController::class, 'index'])->name('orders.index');
 Route::get('trasactions', [transactionsController::class, 'index'])->name('transactions.index');
+Route::get('auctions/index', [AuctionRequestController::class, 'index'])->name('transactions.index');
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('auctions', [AuctionRequestController::class, 'create'])->name('auction-requests.create');
+    Route::post('auction-requests', [AuctionRequestController::class, 'store'])->name('auction-requests.store');
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

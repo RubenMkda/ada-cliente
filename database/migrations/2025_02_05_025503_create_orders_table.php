@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('type', ['dealer', 'broker']);
             $table->foreignId('vehicle_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('auction_vehicle_id')->nullable()->constrained()->onDelete('set null');
             $table->decimal('total_amount', 12, 2);
             $table->enum('status', ['pendiente', 'completado', 'cancelado'])->default('pendiente');
             $table->timestamps(0); 

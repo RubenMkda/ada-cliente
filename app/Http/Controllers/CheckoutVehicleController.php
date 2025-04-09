@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Transaction;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Laravel\Cashier\Cashier;
 use Stripe\Exception\SignatureVerificationException;
@@ -115,27 +116,36 @@ class CheckoutVehicleController extends Controller
             return redirect()->route('checkout-cancel');
         }
     
-        // Obtener el order_id del metadata de la sesión de Stripe
         $orderId = $session->metadata->order_id ?? null;
         
-        if ($orderId) {
-            $order = Order::find($orderId);
-            
-            if ($order) {
-                $transaction = Transaction::create([
-                    'order_id' => $order->id,
-                    'amount' => $session->amount_total / 100, 
-                    'type' => 'deposit', 
-                    'status' => 'completed',
-                    'payment_method' => $session->payment_method_types[0] ?? 'card',
-                    'transaction_date' => now(),
-                ]);
-                $order->update(['status' => 'completado']);
-            }
-        }
-    
         return Inertia::render('checkout/Success', [
             'checkoutSession' => $session,
+        ]);
+    }
+
+    public function processAlternativePayment(Request $request, Order $order)
+    {
+        $order = Order::findOrFail($request->order_id);
+    
+        $transaction = Transaction::create([
+            'order_id' => $order->id,
+            'user_id' => Auth::id(),
+            'amount' => $request->amount,
+            'type' => 'final_payment',
+            'status' => 'pending', 
+            'payment_method' => $request->payment_method,
+            'transaction_date' => now(),
+        ]);
+    
+        $order->update([
+            'status' => 'completado'
+        ]);
+    
+        return response()->json([
+            'success' => true,
+            'transaction' => $transaction,
+            'order' => $order,
+            'message' => 'Pago alternativo registrado correctamente y orden completada'
         ]);
     }
 
