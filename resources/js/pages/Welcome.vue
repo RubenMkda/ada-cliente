@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+
 import { Head } from '@inertiajs/vue3';
 import Carousel from '@/components/Carousel.vue';
 import CarouselHome from '@/components/CarouselHome.vue';
@@ -29,6 +30,7 @@ onMounted(() => {
     
     elements.value.forEach(el => observer.observe(el));
 });
+
 </script>
 
 <template>
