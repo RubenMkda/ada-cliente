@@ -8,7 +8,7 @@
   <div class="checkout-layout bg-greenBold">
     <header>
       <div id="logo">
-        <img src="/images/logo-principal.png" class="h-10 w-10" alt="Logo">
+       <!-- <img src="/images/logo-principal.png" class="h-10 w-10" alt="Logo"> -->
       </div>
     </header>
     <main class="container mx-auto">

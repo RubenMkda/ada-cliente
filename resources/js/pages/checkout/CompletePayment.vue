@@ -53,10 +53,7 @@ export default defineComponent({
   },
   methods: {
     payWithStripe(): void {
-      this.$inertia.post(route('vehicles.checkout.process', { 
-        vehicle: this.vehicle.id,
-        order_id: this.order.id  
-      }));
+      this.$inertia.get(route('vehicles.checkout.process', { vehicle: this.vehicle.id }));
     },
     openModal(method: string): void {
       this.currentPaymentMethod = method;
@@ -102,46 +99,78 @@ export default defineComponent({
 <template>
     <CheckoutLayout>
       <div class="flex flex-col space-y-4 text-gray-700 bg-gray-100 p-8 rounded">
-        <h1 class="text-7xl tracking-wider font-helvetica text-center">{{ vehicle.make.name }} {{ vehicle.model.name }}</h1>
-        
+        <dl>
+        <dt id="logo">
+          <img src="/images/logo-principal.png" class="h-20 w-30" alt="Logo">
+        </dt>
+        <dd>
+          <h1 class="text-7xl tracking-wider font-helvetica text-center">{{ vehicle.make.name }} {{ vehicle.model.name }}</h1>
+        </dd>
+        </dl>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            <div class="flex flex-col p-4 bg-gray-50 rounded-lg shadow-xl shadow-greenBold">
+            <div class="flex flex-col p-4 bg-gray-50 rounded-lg">
+                
+            <form class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+            <div>
+              <div class="mt-6 w-full space-y-6 sm:mt-8 lg:mt-0 lg:max-w-xs xl:max-w-md">
                 <h2 class="text-4xl tracking-wider font-helvetica text-center py-4">Detalles de la Orden</h2>
-                <span class="text-lg">Orden ID: {{ order.id }}</span>
-                <span class="text-lg">Precio: {{ order.total_amount }}$</span>
-                <span class="text-lg">Estado: {{ order.status }}</span>
-                <span class="text-lg">Año: {{ vehicle.year }}</span>
-                <span class="text-lg">VIN: {{ vehicle.VIN }}</span>
+                <div class="flow-root">
+                  <div class="-my-3 divide-y divide-gray-200 dark:divide-gray-800">
+                    <dl class="flex items-center justify-between gap-4 py-3">
+                      <dt class="text-base font-normal text-gray-900">Orden ID: </dt>
+                      <dd class="text-base font-medium text-gray-900">{{ order.id }}</dd>
+                    </dl>                    
+                    <dl class="flex items-center justify-between gap-4 py-3">
+                      <dt class="text-base font-normal text-gray-900">Estado:</dt>
+                      <dd class="text-base font-medium text-gray-900">{{ order.status }}</dd>
+                    </dl>
+                    <dl class="flex items-center justify-between gap-4 py-3">
+                      <dt class="text-base font-normal text-gray-900">Año:</dt>
+                      <dd class="text-base font-medium text-gray-900">{{ vehicle.year }}</dd>
+                    </dl>
+                    <dl class="flex items-center justify-between gap-4 py-3">
+                      <dt class="text-base font-normal text-gray-900">VIN</dt>
+                      <dd class="text-base font-medium text-gray-900">{{ vehicle.VIN }}</dd>
+                    </dl>
+                    <dl class="flex items-center justify-between gap-10 py-3">
+                      <dt class="text-base font-bold text-gray-900">Precio:</dt>
+                      <dd class="text-base font-bold text-gray-900">{{ order.total_amount }}$</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
             </div>
     
             
-            <div class="flex flex-col space-y-4 p-4 bg-gray-50 rounded-lg shadow-xl shadow-greenBold">
+            <div class="flex flex-col space-y-4 p-4 bg-gray-50 rounded-lg">
                 <h2 class="text-4xl tracking-wider font-helvetica text-center py-4">Completar Pago</h2>
             <button
                 @click="payWithStripe"
-                class="bg-primary text-gray-700 px-4 py-2 rounded font-bold"
+                class="bg-primary text-white px-4 py-2 rounded font-bold"
             >
                 Pagar con Stripe
             </button>
     
             <button
                 @click="openModal('zelle')"
-                class="bg-primary text-gray-700 px-4 py-2 rounded font-bold"
+                class="bg-primary text-white px-4 py-2 rounded font-bold"
             >
                 Pagar con Zelle
             </button>
     
             <button
                 @click="openModal('transfer')"
-                class="bg-primary text-gray-700 px-4 py-2 rounded font-bold"
+                class="bg-primary text-white px-4 py-2 rounded font-bold"
             >
                 Pagar con Transferencia
             </button>
     
             <button
                 @click="openModal('deposit')"
-                class="bg-primary text-gray-700 px-4 py-2 rounded font-bold"
+                class="bg-primary text-white px-4 py-2 rounded font-bold"
             >
                 Pagar con Depósito Bancario
             </button>
